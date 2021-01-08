@@ -30,6 +30,7 @@ import sys
 import tempfile
 import threading
 import time
+import ssl
 from operator import itemgetter
 
 if sys.version_info.major == 2:
@@ -1540,7 +1541,7 @@ def run():
     if len(cmdlineparams):
       url += '?' + '&'.join(cmdlineparams)
     hostname = socket.gethostbyname(socket.gethostname()) if options.android else options.hostname
-    url = 'http://' + hostname + ':' + str(options.port) + '/' + url
+    url = 'https://' + hostname + ':' + str(options.port) + '/' + url
 
   os.chdir(serve_dir)
   if not options.no_server:
@@ -1686,8 +1687,9 @@ def run():
       browser_stderr_handle = open(options.log_stderr, 'a')
 
   if not options.no_server:
-    logv('Starting web server: http://%s:%i/' % (options.hostname, options.port))
+    logv('Starting web server: https://%s:%i/' % (options.hostname, options.port))
     httpd = HTTPWebServer((options.hostname, options.port), HTTPHandler)
+    httpd.socket = ssl.wrap_socket (httpd.socket, certfile='./127.0.0.1+1.pem', keyfile='127.0.0.1+1-key.pem', server_side=True)
 
   if not options.no_browser:
     logi("Starting browser: %s" % ' '.join(browser))
@@ -1703,7 +1705,7 @@ def run():
     if options.android:
       browser_process = None
   elif not options.no_server:
-    logi('Now listening at http://%s:%i/' % (options.hostname, options.port))
+    logi('Now listening at https://%s:%i/' % (options.hostname, options.port))
 
   if browser_process:
     premature_quit_code = browser_process.poll()
