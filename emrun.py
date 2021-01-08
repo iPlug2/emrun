@@ -339,6 +339,7 @@ user_pref("browser.privatebrowsing.autostart", true);
 
 
 def is_browser_process_alive():
+  return True
   """Returns whether the browser page we spawned is still running.  (note, not
   perfect atm, in case we are running in detached mode)"""
   global browser_process, current_browser_process_pids, navigation_has_occurred
